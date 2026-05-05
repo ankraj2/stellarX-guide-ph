@@ -1,0 +1,247 @@
+# Recommended AI Tools for StellarX Philippines
+
+A curated guide to the AI tool ecosystem that can help builders move faster during **StellarX Philippines**. This covers Stellar-native AI tools, coding assistants, multi-agent frameworks, and rapid prototyping tools. For local and free model setup, see **`Free_AI_Setup.md`**.
+
+---
+
+## 1. Stellar-Native AI Tools
+
+Start here. These are the most relevant tools if you are building directly on Stellar during StellarX Philippines.
+
+| Resource | What it is | Where to find it |
+|---|---|---|
+| **Stella** | Official AI assistant for Stellar developer questions | https://developers.stellar.org (look for the chat icon); also `#stella-help` on the Stellar developer Discord if available |
+| **llms.txt** | Machine-readable Stellar docs digest for feeding into AI workflows | https://developers.stellar.org/llms.txt |
+| **stellar-dev skill** | Claude Code skill covering Soroban, SDKs, RPC, wallet integration, passkeys, security, and ecosystem patterns | Invoke with `stellar-dev:stellar-dev` in Claude Code; repo: https://github.com/stellar/stellar-dev-skill |
+| **OpenZeppelin skills** | Claude Code skills for secure Stellar smart contract development | Install with `/plugin marketplace add OpenZeppelin/openzeppelin-skills`; repo: https://github.com/OpenZeppelin/openzeppelin-skills |
+| **Smart Account Kit** | TypeScript SDK for building passkey smart wallets on Soroban | https://github.com/kalepail/smart-account-kit |
+| **Stellar MCP Server** | MCP server exposing Stellar wallet, token, and contract tools to AI clients | https://github.com/kalepail/stellar-mcp-server |
+| **XDR MCP** | MCP server for encoding and decoding Stellar XDR to and from JSON | https://github.com/stellar-experimental/mcp-stellar-xdr |
+| **Scaffold Stellar** | CLI tool for managing Stellar app development lifecycle, contracts, testing, and deployment | https://scaffoldstellar.org |
+| **x402** | Per-request HTTP payment protocol for AI agents using Soroban auth entry signing | https://developers.stellar.org/docs/build/apps/x402 |
+
+### Why these matter for StellarX Philippines
+
+These tools are especially useful if you are building:
+- wallets
+- passkey-based onboarding flows
+- Soroban smart contracts
+- payment apps
+- remittance tooling
+- DeFi or stablecoin-based user flows
+- AI-assisted onchain products
+
+The most useful starting points for most teams are:
+1. **Stella** for Stellar-specific questions
+2. **stellar-dev** for Claude Code workflows
+3. **OpenZeppelin skills** if you are touching contracts
+4. **Scaffold Stellar** if you want a more structured app setup
+
+---
+
+## 2. x402: HTTP Payments for AI Agents
+
+`x402` is one of the more interesting pieces of the Stellar AI tooling landscape.
+
+It turns the HTTP `402 Payment Required` response into a real payment flow that AI agents can handle.
+
+### How it works
+- A client hits a paywalled endpoint
+- The server returns a `402` response with payment instructions
+- The client signs a Soroban auth entry
+- The client retries the request with the required payment data
+
+### Why it matters
+This is useful for products where AI agents need to:
+- pay for API calls
+- pay for gated services
+- trigger small programmable financial actions
+- operate autonomously with Stellar-native payment logic
+
+### Useful links
+- Docs: https://developers.stellar.org/docs/build/apps/x402
+- Monorepo: https://github.com/stellar/x402-stellar
+- Example demo: https://github.com/jamesbachini/x402-Stellar-Demo
+
+For most StellarX teams, this is not a default requirement. But if your project includes agents, paid APIs, or programmable service access, it is worth understanding.
+
+---
+
+## 3. OpenZeppelin on Stellar
+
+OpenZeppelin provides a broader platform for secure Stellar smart contract development.
+
+Useful components include:
+- audited Soroban contract patterns
+- contract generation tools
+- MCP support for AI-assisted contract work
+- relayer tools
+- monitoring tools
+- security detectors
+
+### Useful links
+- Main Stellar page: https://www.openzeppelin.com/networks/stellar
+- OpenZeppelin MCP: https://mcp.openzeppelin.com/
+
+### Why it matters for StellarX Philippines
+If your team is building Soroban contracts, OpenZeppelin is useful for:
+- avoiding obvious security mistakes
+- speeding up contract scaffolding
+- using more battle-tested patterns
+- improving audit-readiness of your design
+
+If you are not writing contracts, you may not need this immediately.
+
+---
+
+## 4. AI Coding Assistants
+
+These are the main tools for using AI while actually writing code.
+
+| Tool | Free Tier | Best For | Link |
+|---|---|---|---|
+| **Claude Code** | Paid, or free with local / alternative model setup | Terminal-based agentic coding with repo context | https://claude.com/product/claude-code |
+| **Continue** | Fully free | VS Code / JetBrains with local or cloud models | https://continue.dev |
+| **Cursor** | Free tier available | IDE-style AI coding and quick prototyping | https://cursor.com |
+| **Aider** | Fully free | Terminal + Git-based coding workflows | https://aider.chat |
+| **Windsurf** | Limited free tier | Agentic IDE for larger codebases | https://windsurf.com |
+| **Jules** | Limited free tier | Autonomous coding agent with GitHub integration | https://jules.google.com |
+| **GitHub Copilot** | Free tier available | In-editor suggestions inside VS Code and other IDEs | https://github.com/features/copilot |
+
+### Which one should you use?
+
+#### Best for most builders
+- **Claude Code** if you want structured build workflows, strong reasoning, and multi-step implementation
+- **Cursor** if you want fast in-IDE assistance with low friction
+- **Continue** if you want a fully open setup with local models
+
+#### Best for terminal-first workflows
+- **Claude Code**
+- **Aider**
+
+#### Best for quick hackathon-style iteration
+- **Cursor**
+- **Claude Code**
+- **Google AI Studio** for long-context planning/debugging
+
+For StellarX Philippines, if your goal is to go from idea to demo quickly, the most practical default combo is:
+- **Claude Code or Cursor**
+- **Stella**
+- **Free_AI_Setup.md** if you need zero-cost model access
+
+---
+
+## 5. Multi-Agent Orchestration Frameworks
+
+These are relevant if you are building an AI-powered product, not just using AI to help you code.
+
+| Framework | Style | Link |
+|---|---|---|
+| **LangGraph** | Graph-based stateful workflows | https://github.com/langchain-ai/langgraph |
+| **CrewAI** | Role-based agent teams | https://github.com/joaomdmoura/crewai |
+| **AutoGen (AG2)** | Multi-agent conversational workflows | https://github.com/ag2-ai/ag2 |
+| **OpenAI Agents SDK** | Production-grade agent workflows and tracing | https://openai.github.io/openai-agents-python/ |
+
+### When to care about these
+Only reach for these if your product itself is agentic.
+
+Examples:
+- AI-powered wallet assistant
+- AI payment routing assistant
+- AI-driven support or finance workflow
+- autonomous agents making requests or triggering financial actions
+
+If your project is mainly a wallet, payment app, or DeFi frontend, you probably do **not** need these frameworks.
+
+---
+
+## 6. Rapid Prototyping and App Builders
+
+These tools are useful when you need to move from idea to interface quickly.
+
+| Tool | Free Tier | Best For | Link |
+|---|---|---|---|
+| **Bolt.new** | Free tier available | Full-stack app generation from prompts | https://bolt.new |
+| **v0** | Credits-based free tier | React / Next.js UI generation | https://v0.app |
+| **Google AI Studio** | Fully free | Large-context prompting, planning, debugging, code understanding | https://aistudio.google.com |
+
+### How to use them well
+Use these for:
+- UI scaffolding
+- product mockups
+- initial app shell generation
+- front-end acceleration
+
+Do **not** rely on them blindly for:
+- protocol-critical transaction logic
+- security-sensitive flows
+- wallet signing logic
+- final production architecture
+
+They are best used as accelerators, not as sources of truth.
+
+---
+
+## 7. Suggested Tool Stack for StellarX Philippines
+
+### If you are building a wallet
+Use:
+- **Claude Code** or **Cursor**
+- **Stella**
+- **stellar-dev**
+- **Smart Account Kit** if using passkeys
+- **Claude in Chrome** or similar browser automation for testing
+
+### If you are building a payment or remittance app
+Use:
+- **Claude Code**
+- **Stella**
+- **stellar-dev**
+- **Free_AI_Setup.md** for free model access
+- rapid prototyping tools for UI if needed
+
+### If you are building a Soroban contract app
+Use:
+- **Claude Code**
+- **stellar-dev**
+- **OpenZeppelin skills**
+- **Scaffold Stellar**
+- **Stella**
+
+### If you are building an AI-native product
+Use:
+- **Claude Code**
+- **Stella**
+- one of the multi-agent frameworks only if truly needed
+- **x402** if programmable HTTP payments are relevant
+
+---
+
+## 8. Practical Advice
+
+The best AI setup is not the one with the most tools. It is the one that helps you build the product fastest with the least confusion.
+
+For most teams in StellarX Philippines:
+- use **Stella** for Stellar-specific questions
+- use **Claude Code or Cursor** for development
+- use **Free_AI_Setup.md** if cost is a constraint
+- use **reference repos** before inventing architecture from scratch
+- use AI to tighten scope, not to endlessly expand it
+
+If a tool is slowing you down, simplify.
+
+---
+
+## 9. Final Note
+
+These tools are here to help you:
+- move faster
+- avoid common mistakes
+- reduce setup friction
+- get to a working demo sooner
+
+The strongest StellarX Philippines projects will usually come from teams that:
+- pick a real problem
+- stay tight on scope
+- use the Stellar ecosystem intelligently
+- use AI as leverage, not as a distraction
