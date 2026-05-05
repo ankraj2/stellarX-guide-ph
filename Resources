@@ -1,0 +1,255 @@
+# Resources: Stellar Ecosystem for StellarX Philippines
+
+A curated guide to Stellar ecosystem resources, reference implementations, starter code, and useful links for builders in **StellarX Philippines**. Organized around what you are most likely to need while building wallets, payment apps, remittance tools, DeFi products, and other consumer financial experiences on Stellar.
+
+---
+
+## 1. Environment and API Setup
+
+Everything you should know before writing code. For deeper setup details such as API keys, contract addresses, network assumptions, and implementation gotchas, see **`Dev_Setup_Guide_PH.md`**.
+
+### Testnet Quick Reference
+
+| Resource | Value |
+|---|---|
+| Soroban RPC (testnet) | `https://soroban-testnet.stellar.org` |
+| Friendbot (fund testnet accounts) | `https://friendbot.stellar.org` |
+| Stellar Developer Docs | `https://developers.stellar.org` |
+| Stellar Anchor Directory | `https://anchors.stellar.org` |
+
+### Things Worth Knowing Upfront
+
+- Always confirm which **network** you are using before debugging anything.
+- Always **simulate** Soroban transactions before sending them.
+- `sendTransaction` does **not** mean final success; you still need to poll for final result.
+- Testnet assets may differ by issuer and may not share liquidity across all protocols.
+- If your app depends on a specific asset, issuer, or integration assumption, document it clearly in your `CLAUDE.md`.
+- If you are building for demo day, optimize for the **core user flow** first, not full product completeness.
+
+### Useful Setup References
+
+| Resource | What it is | Link |
+|---|---|---|
+| **Stellar Hackathon FAQ** | Community-compiled FAQ for Stellar builders | https://github.com/briwylde08/stellar-hackathon-faq |
+| **Stellar DeFi Gotchas** | A large collection of protocol-specific pitfalls and integration issues | https://github.com/kaankacar/stellar-defi-gotchas |
+| **DevRel Experiment** | Comparison of Claude Code workflows with and without structured guidance | https://github.com/kaankacar/stellar-devrel-experiment |
+
+---
+
+## 2. Philippines Builder Context
+
+StellarX Philippines is optimized for products that solve real financial problems in the country.
+
+The strongest projects are likely to fall into one or more of these categories:
+- wallets
+- remittance
+- retail payments
+- savings products
+- stablecoin-powered consumer flows
+- DeFi access
+- products for underbanked users
+
+### What to think about early
+
+- Is this product useful in the Philippines, not just generically “onchain”?
+- Does Stellar materially improve the user experience?
+- Does the product need:
+  - wallet integration
+  - fiat on/off-ramp
+  - stablecoin support
+  - anchor connectivity
+  - DeFi composability
+- Can the product be demonstrated clearly in a short demo?
+
+### Anchor / payment rail awareness
+
+For Philippines-focused builders, it is useful to understand the difference between:
+- **issuer**
+- **anchor**
+- **wallet**
+- **distribution partner**
+
+You should also spend time mapping:
+- local payment rails
+- remittance corridors
+- potential anchor or fintech partners
+- where the real bottlenecks are for users
+
+This is often more valuable than jumping straight into code.
+
+---
+
+## 3. Starter Repos and Reference Implementations
+
+### Stellar DeFi App
+
+**Repo:** https://github.com/kaankacar/stellar-defi-app
+
+A strong reference implementation for understanding how major Stellar DeFi protocols fit together in one product.
+
+Useful for:
+- seeing how protocol composition works
+- understanding API shapes and response formats
+- working with lending, swaps, and price feeds
+- understanding portfolio-style UI patterns
+
+| Protocol | What it demonstrates |
+|---|---|
+| Blend | Lending / borrowing and risk monitoring |
+| Soroswap Aggregator | DEX routing |
+| Phoenix | Swaps |
+| Aquarius | AMM / swap flows |
+| SDEX | Native Stellar DEX |
+| Reflector Oracle | On-chain price feeds |
+
+This is especially useful if you are building:
+- DeFi dashboards
+- wallet portfolio views
+- swap or savings products
+- lending / borrowing interfaces
+
+---
+
+### AI Integration Series
+
+A useful set of smaller example apps built with Claude Code that show how AI-assisted development can be used for Stellar integrations.
+
+| Repo | What it demonstrates |
+|---|---|
+| https://github.com/carstenjacobsen/ai-freighter-integration | Wallet connection, balances, payments, transaction history |
+| https://github.com/carstenjacobsen/ai-soroswap-integration | Multi-DEX swap routing |
+| https://github.com/carstenjacobsen/ai-defindex-integration | Yield vault deposits / withdrawals |
+| https://github.com/carstenjacobsen/ai-passkeys-integration | Passkey wallet patterns |
+| https://github.com/carstenjacobsen/ai-etherfuse-integration | Example of integrating wallet + on/off-ramp style flow |
+
+Even where the regional or provider context differs, these repos are still useful for:
+- project structure
+- Claude-assisted workflow patterns
+- integration boundaries
+- frontend / backend separation
+
+---
+
+## 4. Ecosystem Discovery
+
+These resources are useful when you want to see what already exists in Stellar so you do not reinvent the wheel.
+
+| Resource | What it is | Link |
+|---|---|---|
+| **Stellar Ecosystem Resources** | Official ecosystem resource hub with guides, integrations, and references | https://github.com/stellar/ecosystem-resources/ |
+| **Stellar Ecosystem DB** | Structured database of Stellar projects and ecosystem metadata | https://github.com/lumenloop/stellar-ecosystem-db |
+| **Awesome Stellar Community Fund** | SCF-focused resources and examples | https://github.com/lumenloop/awesome-stellar-community-fund |
+
+### How to use these
+- find existing projects in your category
+- identify protocols and integrations worth building on top of
+- discover wallet, oracle, or DeFi tooling
+- avoid duplicating obvious ideas
+- understand what a strong post-hackathon / post-program path can look like
+
+---
+
+## 5. Useful Official and Community Resources
+
+### Stellar Developer Docs
+**Link:** https://developers.stellar.org
+
+This should be your first stop for:
+- SDK references
+- Soroban docs
+- transaction flow
+- testing
+- contract development
+- Stellar architecture basics
+
+### Stella
+Stellar’s AI assistant is available through the developer docs site and is useful for Stellar-specific questions.
+
+Use Stella when you need help with:
+- Stellar concepts
+- Soroban questions
+- SDK usage
+- assets and accounts
+- transaction patterns
+- protocol-specific clarification
+
+### Stellar Anchor Directory
+**Link:** https://anchors.stellar.org
+
+Useful if you want to understand:
+- available on/off-ramp infrastructure
+- real-world financial rails around Stellar
+- which companies act as bridges between Stellar and fiat systems
+
+---
+
+## 6. What Builders Should Look For in Reference Material
+
+When evaluating a repo or guide, look for the following:
+
+### Strong signs
+- clear product flow
+- clear folder structure
+- testable implementation
+- documented assumptions
+- explicit network configuration
+- real transaction handling
+- useful build reports or notes
+
+### Weak signs
+- outdated SDK usage
+- unclear asset assumptions
+- no error handling
+- no explanation of why the architecture was chosen
+- demo-only code with no clarity on how it actually works
+
+Use reference repos to accelerate understanding, not to copy blindly.
+
+---
+
+## 7. Videos Worth Watching
+
+These are useful if you want to think more clearly about what to build and how to use AI well while building.
+
+| Title | Why it matters | Link |
+|---|---|---|
+| **Scoping and Evaluating Your Project** | Helps you validate whether your idea is worth building before you start coding | https://x.com/BuildOnStellar/status/2029288908639666402 |
+| **The Builder's Guide to AI Prompt Engineering** | Helps you get better output from AI tools during development | https://x.com/BuildOnStellar/status/2008902190090613013 |
+| **Vibe Coding 5 ZK Games in 90 Minutes** | Useful for understanding fast AI-assisted build workflows | https://x.com/i/broadcasts/1dRKZaYYbbdxB |
+| **A First Look: Nethermind's SPP** | Useful for broader exposure to what is being built in the Stellar ecosystem | https://x.com/i/broadcasts/1pKkOyOyOnwKj |
+
+---
+
+## 8. Recommended Way to Use This File
+
+If you are just getting started:
+
+1. Read **`README.md`**
+2. Read **`Starter_Prompts.md`**
+3. Read **`Dev_Setup_Guide_PH.md`**
+4. Use this file to identify:
+   - useful repos
+   - relevant ecosystem building blocks
+   - example patterns
+   - useful videos and links
+
+If you are already building:
+- use this file to find missing references
+- compare your architecture to working examples
+- discover protocols or tools you may have missed
+- identify what will make your demo stronger
+
+---
+
+## 9. Final Note
+
+The purpose of this file is not to overwhelm you with links.
+
+It is to help you get to the right resources faster so you can spend more time building something real for StellarX Philippines.
+
+The strongest teams will usually do three things well:
+- choose a real problem
+- keep the product scope tight
+- use the ecosystem intelligently
+
+Use these resources to move faster, not to get distracted.
