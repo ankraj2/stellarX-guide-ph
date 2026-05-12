@@ -1,0 +1,360 @@
+# Dev Setup Guide
+
+> Get everything in this file sorted before writing code. This version is adapted for **StellarX Philippines** and intentionally excludes anchor-specific provider content.
+
+---
+
+## Section 1: Core Environment Setup
+
+You can start building most StellarX Philippines projects without needing third-party API keys.
+
+This guide is focused on:
+- Stellar network setup
+- testnet infrastructure
+- protocol references
+- auth and SDK patterns
+- critical gotchas that can waste time during a build
+
+### Protocol Access Overview
+
+| Protocol / Tool | Key Required | Notes |
+|---|---|---|
+| Soroswap | No | Public protocol access |
+| Aquarius | No | Public protocol access |
+| Blend | No | Public protocol access |
+| Reflector Oracle | No | Public oracle references |
+| Soroban RPC | Sometimes, depending on provider | Testnet public RPC available |
+| Freighter | No | Browser extension wallet |
+| Stellar Wallets Kit | No | SDK/tooling layer |
+
+---
+
+## Section 2: Testnet Contract Addresses
+
+These are useful addresses and references for building on Stellar testnet. Testnet contracts and deployments can change over time, so if something stops working, verify against the latest protocol sources.
+
+### Stellar Testnet Infrastructure
+
+| Resource | Value |
+|---|---|
+| Soroban RPC | `https://soroban-testnet.stellar.org` |
+| Friendbot | `https://friendbot.stellar.org` |
+
+### Stellar Testnet USDC & XLM SACs
+
+| Asset | Address |
+|---|---|
+| Circle USDC | `CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA` |
+| XLM | `CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC` |
+
+---
+
+### Soroswap (testnet)
+
+| Contract | Address |
+|---|---|
+| Router | `CCJUD55AG6W5HAI5LRVNKAE5WDP5XGZBUDS5WNTIVDU7O264UZZE7BRD` |
+| Factory | `CDP3HMUH6SMS3S7NPGNDJLULCOXXEPSHY4JKUKMBNQMATHDHWXRRJTBY` |
+
+Source: Soroswap public contract registry
+
+---
+
+### Blend (testnet)
+
+| Contract | Address |
+|---|---|
+| Pool Factory V2 | `CDV6RX4CGPCOKGTBFS52V3LMWQGZN3LCQTXF5RVPOOCG4XVMHXQ4NTF6` |
+| Backstop V2 | `CBDVWXT433PRVTUNM56C3JREF3HIZHRBA64NB2C3B2UNCKIS65ZYCLZA` |
+| TestnetV2 Pool | `CCEBVDYM32YNYCVNRXQKDFFPISJJCV557CDZEIRBEE4NCV4KHPQ44HGF` |
+
+Source: Blend public contract registry
+
+---
+
+### Aquarius (testnet)
+
+Aquarius does not maintain a single static list in this guide. Use the testnet app or official references to find current pool addresses:
+- https://testnet.aqua.network/pools
+
+---
+
+### Reflector Oracle (testnet)
+
+Oracle contract references are available from:
+- https://reflector.network/oracles
+
+Use the mainnet / testnet toggle where relevant.
+
+> Testnet contracts can change over time. If an address stops working, verify against the latest official source before debugging your app logic.
+
+---
+
+## Section 3: Testnet Asset Registry
+
+One of the biggest causes of confusion on testnet is assuming that all assets with the same symbol are interchangeable.
+
+### USDC on Testnet
+
+Different protocols may reference different USDC issuers or asset paths on testnet. Do not assume that “USDC is USDC” across every protocol and pool.
+
+| Source | Issuer Address | Used by |
+|---|---|---|
+| Circle (standard testnet) | `GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5` | Soroswap, SDEX, many generic testnet flows |
+| Blend-specific usage | `GATALTGTWIOT6BUDBCZM3Q4OQ4BO2COLOAZ7IYSKPLC2PMSOPPGF5V56` | Blend pools / protocol-specific testing |
+
+### Rule
+
+Before building around a specific protocol, confirm which issuer or asset representation it expects. A mismatch can lead to swaps failing silently or liquidity appearing unavailable.
+
+---
+
+## Section 4: Authentication Patterns
+
+Authentication varies depending on what infrastructure provider or API you are using.
+
+### General Rule
+
+- Public onchain protocols such as Soroswap, Aquarius, Blend, and many oracle reads do **not** require API auth for standard usage.
+- Soroban RPC auth depends on the provider.
+- Some providers use Bearer tokens.
+- Some providers use `X-API-Key`.
+- Public testnet endpoints may require no auth at all.
+
+### Soroban RPC
+
+| Provider Type | Common Auth Pattern |
+|---|---|
+| Public testnet RPC | Usually none |
+| Managed RPC provider | Often `Authorization: Bearer ...` or `X-API-Key: ...` |
+
+### Practical Advice
+
+If you are using:
+- the public Stellar testnet RPC, start without auth
+- a commercial RPC provider, check that provider’s exact auth format before coding against it
+
+Do not assume all Stellar infrastructure uses the same auth pattern.
+
+---
+
+## Section 5: Critical Setup Gotchas
+
+These are the issues that repeatedly waste time during Stellar builds.
+
+---
+
+### Soroban: always simulate before sending
+
+```typescript
+const simulation = await server.simulateTransaction(tx);
+const assembled = rpc.assembleTransaction(tx, simulation);
+await server.sendTransaction(assembled);
+```
+
+Skipping simulation leads to confusing failures and incomplete transaction preparation.
+
+---
+
+### Soroban: wrong network passphrase gives `tx_bad_auth`
+
+A network passphrase mismatch can look like an auth problem instead of a network mismatch.
+
+Always derive the passphrase from:
+- `Networks.TESTNET`
+- `Networks.PUBLIC`
+
+Do not hardcode strings unless you are absolutely sure.
+
+---
+
+### Soroban: storage entries expire — extend TTLs proactively
+
+Soroban storage entries have TTL limits measured in ledgers. If they expire, data is archived and reads can fail with missing-value errors.
+
+Good practice:
+- monitor TTL if you are writing contracts
+- extend storage before it gets too low
+- understand instance vs persistent storage if you are building contracts directly
+
+---
+
+### `sendTransaction` does not mean success
+
+A successful `sendTransaction` call does **not** mean the transaction succeeded onchain.
+
+You need to poll for final result:
+
+```typescript
+for (let i = 0; i < 60; i++) {
+  await new Promise(r => setTimeout(r, 1000));
+  const result = await server.getTransaction(hash);
+  if (result.status !== 'NOT_FOUND') return result;
+}
+throw new Error('Transaction timeout after 60s');
+```
+
+If available in your SDK version, you can also use:
+- `rpc.Server.pollTransaction(...)`
+
+---
+
+### Freighter: API calls may hang if the extension is not installed
+
+If the Freighter extension is missing, some API calls can hang indefinitely.
+
+Wrap calls with a timeout:
+
+```typescript
+function withTimeout(promise, ms = 2000) {
+  return Promise.race([
+    promise,
+    new Promise(resolve => setTimeout(() => resolve(null), ms))
+  ]);
+}
+```
+
+Treat a `null` result as:
+- extension missing
+- extension unavailable
+- or user environment not ready
+
+---
+
+### Freighter: do not statically import in SSR apps
+
+`@stellar/freighter-api` depends on browser globals. Static imports can break server-side rendering.
+
+Use dynamic imports instead:
+
+```typescript
+const { isConnected } = await import('@stellar/freighter-api');
+```
+
+---
+
+### Freighter API v6: `signTransaction()` returns an object
+
+In v6, `signTransaction()` returns an object, not a raw string.
+
+```typescript
+const result = await signTransaction(xdr, { networkPassphrase, address });
+const signedXdr = result.signedTxXdr;
+```
+
+If you pass the whole object where a string is expected, things will fail in non-obvious ways.
+
+---
+
+### Trustlines before assets
+
+Before a wallet can receive a classic Stellar asset, it must establish a trustline.
+
+If you skip this, you may get:
+- `op_no_destination`
+- asset receipt failures
+- or confusing no-op behavior
+
+Always set trustlines before any receive flow involving non-native assets.
+
+---
+
+### Soroswap SDK: amounts must be `BigInt`
+
+Passing regular numbers can cause validation issues or silent failures.
+
+Use:
+
+```typescript
+amount: BigInt(userInput)
+```
+
+and confirm any protocol-specific slippage or numeric formatting requirements before wiring UI input directly into calls.
+
+---
+
+### Use Soroban RPC as the default server
+
+Use `rpc.Server` as the default for most operations:
+- smart contract calls
+- simulation
+- submission
+- classic transaction submission
+- account sequence fetches in modern flows
+
+Use Horizon only when you specifically need:
+- historical lookups
+- legacy patterns
+- or something not exposed in your chosen RPC flow
+
+| Need | Use |
+|---|---|
+| Smart contract calls | Soroban RPC (`rpc.Server`) |
+| Classic tx submission | Soroban RPC (`rpc.Server`) |
+| Sequence number / tx flow | Soroban RPC (`rpc.Server`) |
+| Historical lookup (if unavoidable) | Horizon (`Horizon.Server`) |
+
+---
+
+### WebAuthn passkeys: `rpId` must be a domain
+
+If you are building passkey-based flows:
+- use `localhost` for local development
+- do **not** use raw IP addresses as the `rpId`
+
+WebAuthn rejects IP-based `rpId` values in many cases.
+
+---
+
+### SDK version drift is real
+
+A lot of web examples and older code snippets still use older Stellar SDK patterns.
+
+Common example:
+- old namespace: `SorobanRpc`
+- current v14 pattern: `rpc`
+
+If copied code does not work, check the SDK version before debugging the logic itself.
+
+---
+
+## Section 6: Known Limitations and What to Ask a Mentor
+
+These are areas where builders often lose time because the docs are incomplete, stale, or too generic.
+
+### Things to verify early with a mentor or reviewer
+- which exact testnet asset issuer your chosen protocol expects
+- whether a referenced testnet contract address is still current
+- whether your SDK example is aligned with the version you installed
+- whether a given protocol path should use RPC directly or a higher-level SDK
+- whether your build really needs Freighter, Wallets Kit, passkeys, or none of them
+
+### Things that often cause confusion
+- Horizon vs Soroban RPC usage
+- classic asset vs SAC representation
+- transaction submission vs transaction finality
+- protocol registries that move over time
+- copied examples that target an older SDK version
+
+### Useful rule
+
+If you are stuck on something that feels like:
+- “this should work, but doesn’t”
+- “the docs say one thing, the code says another”
+- “I cannot tell if the bug is my app or the protocol”
+
+stop debugging in circles and confirm the assumption first.
+
+---
+
+## Final Note
+
+This guide is intentionally focused on the parts of Stellar setup that matter most for **StellarX Philippines**:
+- network setup
+- protocol references
+- wallet and signing behavior
+- transaction flow
+- testnet assumptions
+- common developer mistakes
+
+If you get these right early, the rest of the build will move much faster.
